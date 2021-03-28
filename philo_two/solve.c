@@ -5,17 +5,17 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: juyang <juyang@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/03/23 16:36:24 by juyang            #+#    #+#             */
-/*   Updated: 2021/03/23 16:36:25 by juyang           ###   ########.fr       */
+/*   Created: 2021/03/28 14:29:55 by juyang            #+#    #+#             */
+/*   Updated: 2021/03/28 14:29:56 by juyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo_one.h"
+#include "philo_two.h"
 
 void				take_fork(t_philosopher *philo)
 {
-	pthread_mutex_lock(philo->left_fork);
-	pthread_mutex_lock(philo->right_fork);
+	sem_wait(philo->left_fork);
+	sem_wait(philo->right_fork);
 	if (philo->prog_ptr->system.finish == 0)
 		print_state("has taken a fork", philo);
 }
@@ -37,13 +37,13 @@ void				eating(t_philosopher *philo)
 		print_state("is Eating", philo);
 		wait_time(philo->last_eat, philo->time_to_eat);
 		philo->eat_cnt++;
-		pthread_mutex_unlock(philo->left_fork);
-		pthread_mutex_unlock(philo->right_fork);
+		sem_post(philo->left_fork);
+		sem_post(philo->right_fork);
 	}
 	else
 	{
-		pthread_mutex_unlock(philo->left_fork);
-		pthread_mutex_unlock(philo->right_fork);
+		sem_post(philo->left_fork);
+		sem_post(philo->right_fork);
 	}
 }
 

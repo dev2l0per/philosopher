@@ -5,12 +5,12 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: juyang <juyang@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/03/23 16:32:39 by juyang            #+#    #+#             */
-/*   Updated: 2021/03/23 16:32:39 by juyang           ###   ########.fr       */
+/*   Created: 2021/03/28 14:30:09 by juyang            #+#    #+#             */
+/*   Updated: 2021/03/28 14:30:10 by juyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo_one.h"
+#include "philo_two.h"
 
 long long int		get_time(void)
 {
@@ -52,31 +52,31 @@ void				print_state(char *str, t_philosopher *philo)
 	if (philo->status != DIED && philo->status != FULL
 	&& philo->prog_ptr->system.finish == 0)
 	{
-		pthread_mutex_lock(&philo->prog_ptr->system.write);
+		sem_wait(philo->prog_ptr->system.write);
 		printf("%lldms %d ", get_time() -
 		philo->prog_ptr->system.start_time, philo->index);
 		printf("%s\n", str);
-		pthread_mutex_unlock(&philo->prog_ptr->system.write);
+		sem_post(philo->prog_ptr->system.write);
 	}
 	else if (philo->status == DIED)
 	{
-		pthread_mutex_lock(&philo->prog_ptr->system.write);
+		sem_wait(philo->prog_ptr->system.write);
 		printf("%lldms %d ", get_time() -
 		philo->prog_ptr->system.start_time, philo->index);
 		printf("%s\n", str);
-		pthread_mutex_unlock(&philo->prog_ptr->system.write);
+		sem_post(philo->prog_ptr->system.write);
 	}
 }
 
 void				clear(t_prog *prog)
 {
-	int			i;
-
-	i = -1;
-	while (++i < prog->system.number_of_philosophers)
-		pthread_mutex_destroy(&prog->system.forks[i]);
-	pthread_mutex_destroy(&prog->system.status);
-	pthread_mutex_destroy(&prog->system.write);
-	free(prog->system.forks);
+	sem_unlink("forks");
+	sem_unlink("write");
+	sem_unlink("status");
+	sem_unlink("finish_check");
+	sem_close(prog->system.forks);
+	sem_close(prog->system.write);
+	sem_close(prog->system.status);
+	sem_close(prog->system.finish_check);
 	free(prog->philo);
 }

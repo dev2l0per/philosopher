@@ -5,12 +5,12 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: juyang <juyang@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/03/23 16:18:54 by juyang            #+#    #+#             */
-/*   Updated: 2021/03/23 16:18:55 by juyang           ###   ########.fr       */
+/*   Created: 2021/03/28 14:29:22 by juyang            #+#    #+#             */
+/*   Updated: 2021/03/28 14:29:22 by juyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo_one.h"
+#include "philo_two.h"
 
 int					ft_isdigit(int c)
 {
@@ -80,13 +80,12 @@ int					main(int argc, char **argv)
 			printf("Error\n");
 			return (0);
 		}
-		if (prog.system.number_of_philosophers < 2)
+		if (semaphore_init(&prog) == -1)
 		{
 			printf("Error\n");
 			return (0);
 		}
 		philosopher_init(&prog);
-		mutex_init(&prog);
 		prog_run(&prog);
 		clear(&prog);
 	}

@@ -5,12 +5,12 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: juyang <juyang@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/03/23 16:32:39 by juyang            #+#    #+#             */
-/*   Updated: 2021/03/23 16:32:39 by juyang           ###   ########.fr       */
+/*   Created: 2021/03/28 16:24:53 by juyang            #+#    #+#             */
+/*   Updated: 2021/03/28 16:24:55 by juyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo_one.h"
+#include "philo_three.h"
 
 long long int		get_time(void)
 {
@@ -52,31 +52,66 @@ void				print_state(char *str, t_philosopher *philo)
 	if (philo->status != DIED && philo->status != FULL
 	&& philo->prog_ptr->system.finish == 0)
 	{
-		pthread_mutex_lock(&philo->prog_ptr->system.write);
-		printf("%lldms %d ", get_time() -
-		philo->prog_ptr->system.start_time, philo->index);
-		printf("%s\n", str);
-		pthread_mutex_unlock(&philo->prog_ptr->system.write);
+		sem_wait(philo->prog_ptr->system.write);
+		ft_putnbr_fd(get_time() - philo->prog_ptr->system.start_time, 1);
+		ft_putstr_fd("ms ", 1);
+		ft_putnbr_fd(philo->index, 1);
+		ft_putstr_fd(str, 1);
+		ft_putchar_fd('\n', 1);
+		sem_post(philo->prog_ptr->system.write);
 	}
 	else if (philo->status == DIED)
 	{
-		pthread_mutex_lock(&philo->prog_ptr->system.write);
-		printf("%lldms %d ", get_time() -
-		philo->prog_ptr->system.start_time, philo->index);
-		printf("%s\n", str);
-		pthread_mutex_unlock(&philo->prog_ptr->system.write);
+		sem_wait(philo->prog_ptr->system.write);
+		ft_putnbr_fd(get_time() - philo->prog_ptr->system.start_time, 1);
+		ft_putstr_fd("ms ", 1);
+		ft_putnbr_fd(philo->index, 1);
+		ft_putstr_fd(str, 1);
+		ft_putchar_fd('\n', 1);
+		sem_post(philo->prog_ptr->system.write);
 	}
 }
 
 void				clear(t_prog *prog)
 {
-	int			i;
+	int				i;
 
+	sem_unlink("forks");
+	sem_unlink("write");
+	sem_unlink("status");
+	sem_unlink("finish_check");
+	sem_close(prog->system.forks);
+	sem_close(prog->system.write);
+	sem_close(prog->system.status);
+	sem_close(prog->system.finish_check);
 	i = -1;
 	while (++i < prog->system.number_of_philosophers)
-		pthread_mutex_destroy(&prog->system.forks[i]);
-	pthread_mutex_destroy(&prog->system.status);
-	pthread_mutex_destroy(&prog->system.write);
-	free(prog->system.forks);
+		kill(prog->philo[i].pid, SIGKILL);
 	free(prog->philo);
+}
+
+void				ft_putnbr_fd(long long int n, int fd)
+{
+	char		c;
+	long long	nbr;
+
+	if (fd < 0)
+		return ;
+	nbr = n;
+	if (nbr == 0)
+	{
+		write(fd, "0", 1);
+	}
+	if (nbr < 0)
+	{
+		write(fd, "-", 1);
+		nbr = nbr * -1;
+	}
+	if (nbr > 0)
+	{
+		if (nbr / 10 > 0)
+			ft_putnbr_fd(nbr / 10, fd);
+		c = nbr % 10 + '0';
+		write(fd, &c, 1);
+	}
 }

@@ -1,22 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philo_one.h                                        :+:      :+:    :+:   */
+/*   philo_two.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: juyang <juyang@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/03/23 16:14:18 by juyang            #+#    #+#             */
-/*   Updated: 2021/03/23 16:14:19 by juyang           ###   ########.fr       */
+/*   Created: 2021/03/28 14:28:17 by juyang            #+#    #+#             */
+/*   Updated: 2021/03/28 14:28:18 by juyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PHILO_ONE_H
-# define PHILO_ONE_H
+#ifndef PHILO_TWO_H
+# define PHILO_TWO_H
 
 # include <stdlib.h>
 # include <pthread.h>
 # include <unistd.h>
 # include <sys/time.h>
+# include <semaphore.h>
 # include <stdio.h>
 
 # define ALIVE	0
@@ -29,10 +30,10 @@ typedef struct		s_system
 	int				finish;
 	int				number_of_times_each_philosopher_must_eat;
 	long long int	start_time;
-	pthread_mutex_t	*forks;
-	pthread_mutex_t	status;
-	pthread_mutex_t write;
-	pthread_mutex_t finish_check;
+	sem_t			*forks;
+	sem_t			*status;
+	sem_t			*write;
+	sem_t			*finish_check;
 }					t_system;
 
 typedef struct		s_philosopher
@@ -41,8 +42,8 @@ typedef struct		s_philosopher
 	int				index;
 	int				eat_cnt;
 	long long int	last_eat;
-	pthread_mutex_t	*left_fork;
-	pthread_mutex_t	*right_fork;
+	sem_t			*left_fork;
+	sem_t			*right_fork;
 	struct s_prog	*prog_ptr;
 	int				status;
 	long long int	time_to_die;
@@ -60,7 +61,7 @@ void				prog_run(t_prog *prog);
 
 int					argument_init(t_prog *prog, int argc, char **argv);
 void				philosopher_init(t_prog *prog);
-void				mutex_init(t_prog *prog);
+int					semaphore_init(t_prog *prog);
 
 long long int		get_time(void);
 int					ft_atoi(const char *str);

@@ -5,12 +5,12 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: juyang <juyang@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/03/23 16:18:54 by juyang            #+#    #+#             */
-/*   Updated: 2021/03/23 16:18:55 by juyang           ###   ########.fr       */
+/*   Created: 2021/03/28 16:24:21 by juyang            #+#    #+#             */
+/*   Updated: 2021/03/28 16:24:22 by juyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo_one.h"
+#include "philo_three.h"
 
 int					ft_isdigit(int c)
 {
@@ -40,29 +40,33 @@ int					check_arg(int argc, char **argv)
 	return (0);
 }
 
-void				prog_run(t_prog *prog)
+int					prog_run(t_prog *prog)
 {
 	int				i;
 	pthread_t		full_th;
+	pthread_t		finish_ch;
 
-	i = 0;
-	prog->system.finish = 0;
+	i = -1;
 	prog->system.start_time = get_time();
-	while (i < prog->system.number_of_philosophers)
+	while (++i < prog->system.number_of_philosophers)
 	{
-		pthread_create(&prog->philo[i].p_thread,
-		NULL, solve, (void *)&prog->philo[i]);
-		usleep(50);
-		i++;
+		prog->philo[i].pid = fork();
+		if (prog->philo[i].pid == -1)
+			return (-1);
+		else if (prog->philo[i].pid == 0)
+		{
+			solve((void *)&prog->philo[i]);
+			exit(0);
+		}
 	}
 	if (prog->system.number_of_times_each_philosopher_must_eat > 0)
 	{
 		pthread_create(&full_th, NULL, full_check, (void *)prog);
-		pthread_detach(full_th);
+		pthread_join(full_th, NULL);
 	}
-	i = 0;
-	while (i < prog->system.number_of_philosophers)
-		pthread_join(prog->philo[i++].p_thread, NULL);
+	pthread_create(&finish_ch, NULL, finish_check, (void *)prog);
+	pthread_join(finish_ch, NULL);
+	return (0);
 }
 
 int					main(int argc, char **argv)
@@ -80,14 +84,14 @@ int					main(int argc, char **argv)
 			printf("Error\n");
 			return (0);
 		}
-		if (prog.system.number_of_philosophers < 2)
+		if (semaphore_init(&prog) == -1)
 		{
 			printf("Error\n");
 			return (0);
 		}
 		philosopher_init(&prog);
-		mutex_init(&prog);
-		prog_run(&prog);
+		if (prog_run(&prog) == -1)
+			return (0);
 		clear(&prog);
 	}
 	return (0);
