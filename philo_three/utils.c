@@ -74,19 +74,11 @@ void				print_state(char *str, t_philosopher *philo)
 
 void				clear(t_prog *prog)
 {
-	int				i;
-
-	sem_unlink("forks");
-	sem_unlink("write");
-	sem_unlink("status");
-	sem_unlink("finish_check");
-	sem_close(prog->system.forks);
-	sem_close(prog->system.write);
+	// sem_close(prog->system.forks);
+	// sem_close(prog->system.write);
 	sem_close(prog->system.status);
-	sem_close(prog->system.finish_check);
-	i = -1;
-	while (++i < prog->system.number_of_philosophers)
-		kill(prog->philo[i].pid, SIGKILL);
+	// printf("asdafdsadsf\n");
+	// sem_close(prog->system.finish_check);
 	free(prog->philo);
 }
 

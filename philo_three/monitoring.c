@@ -25,7 +25,7 @@ void				*full_check(void *arg)
 	{
 		sem_wait(prog->system.status);
 		full_cnt++;
-		if (full_cnt == prog->system.number_of_philosophers)
+		if (full_cnt == prog->system.number_of_philosophers && prog->system.finish == 0)
 		{
 			prog->philo[i].status = FULL;
 			printf("All Philosophers are full\n");
@@ -46,8 +46,12 @@ void				*death_check(void *arg)
 	{
 		if ((get_time() - philo->last_eat) > philo->time_to_die)
 		{
-			print_state(" is Died", philo);
 			philo->status = DIED;
+			sem_wait(philo->prog_ptr->system.write);
+			ft_putnbr_fd(get_time() - philo->prog_ptr->system.start_time, 1);
+			ft_putstr_fd("ms ", 1);
+			ft_putnbr_fd(philo->index, 1);
+			ft_putstr_fd(" is Died\n", 1);
 			sem_post(philo->prog_ptr->system.finish_check);
 		}
 		usleep(50);
