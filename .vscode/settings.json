@@ -1,0 +1,7 @@
+{
+	"files.associations": {
+		"__mutex_base": "c",
+		"philo_one.h": "c",
+		"__locale": "c"
+	}
+}
