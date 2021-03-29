@@ -79,4 +79,8 @@ void				*full_check(void *arg);
 int					full_cnt_check(t_prog *prog, int full_cnt);
 void				wait_time(long long int save, long long int time_to);
 
+void				ft_putchar_fd(char c, int fd);
+void				ft_putstr_fd(char *s, int fd);
+void				ft_putnbr_fd(long long int n, int fd);
+
 #endif

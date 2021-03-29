@@ -22,20 +22,25 @@ int					check_arg(int argc, char **argv)
 	int				i;
 	int				j;
 
-	i = 1;
-	while (i < argc)
+	i = 0;
+	while (++i < argc)
 	{
 		j = 0;
 		while (j < argv[i][j])
 		{
-			if (!ft_isdigit(argv[i][j]))
+			if (!ft_isdigit(argv[i][j++]))
 			{
 				printf("Error\n");
 				return (-1);
 			}
-			j++;
 		}
-		i++;
+	}
+	if (ft_atoi(argv[1]) < 2)
+		return (-1);
+	if (argc == 6)
+	{
+		if (ft_atoi(argv[5]) <= 0)
+			return (-1);
 	}
 	return (0);
 }
@@ -62,7 +67,7 @@ int					prog_run(t_prog *prog)
 	if (prog->system.number_of_times_each_philosopher_must_eat > 0)
 	{
 		pthread_create(&full_th, NULL, full_check, (void *)prog);
-		pthread_join(full_th, NULL);
+		pthread_detach(full_th);
 	}
 	pthread_create(&finish_ch, NULL, finish_check, (void *)prog);
 	pthread_join(finish_ch, NULL);
@@ -77,9 +82,8 @@ int					main(int argc, char **argv)
 		write(1, "Argument Error\n", 15);
 	else
 	{
-		if (check_arg(argc, argv) == -1)
-			return (0);
-		if (argument_init(&prog, argc, argv) == -1)
+		if (check_arg(argc, argv) == -1
+		|| argument_init(&prog, argc, argv) == -1)
 		{
 			printf("Error\n");
 			return (0);

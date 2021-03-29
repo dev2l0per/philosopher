@@ -6,6 +6,7 @@
 		"unistd.h": "c",
 		"philo_two.h": "c",
 		"philo_three.h": "c",
-		"sstream": "c"
+		"sstream": "c",
+		"cstdlib": "c"
 	}
 }

@@ -22,6 +22,16 @@ void				take_fork(t_philosopher *philo)
 
 void				sleeping(t_philosopher *philo)
 {
+	if (philo->prog_ptr->system.number_of_times_each_philosopher_must_eat
+	&& philo->eat_cnt >=
+	philo->prog_ptr->system.number_of_times_each_philosopher_must_eat)
+	{
+		philo->status = FULL;
+		sem_post(philo->left_fork);
+		sem_post(philo->right_fork);
+		sem_post(philo->prog_ptr->system.status);
+		return ;
+	}
 	if (philo->status != DIED && philo->status != FULL)
 	{
 		print_state(" is Sleeping", philo);
@@ -33,13 +43,6 @@ void				eating(t_philosopher *philo)
 {
 	if (philo->status != DIED && philo->status != FULL)
 	{
-		if (philo->prog_ptr->system.number_of_times_each_philosopher_must_eat
-		&& philo->eat_cnt >=
-		philo->prog_ptr->system.number_of_times_each_philosopher_must_eat)
-		{
-			sem_post(philo->prog_ptr->system.status);
-			philo->status = FULL;
-		}
 		philo->last_eat = get_time();
 		print_state(" is Eating", philo);
 		wait_time(philo->last_eat, philo->time_to_eat);

@@ -7,7 +7,8 @@ SRCS = monitoring.c \
        solve.c \
        utils.c \
        init.c \
-       main.c
+       main.c \
+	   utils2.c
 
 OBJS = $(SRCS:%.c=%.o)
 

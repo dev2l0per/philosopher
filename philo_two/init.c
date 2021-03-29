@@ -14,21 +14,21 @@
 
 int					semaphore_init(t_prog *prog)
 {
-	sem_unlink("forks");
-	sem_unlink("status");
-	sem_unlink("write");
-	sem_unlink("finish_check");
-	prog->system.forks = sem_open("forks",
+	sem_unlink("/forks");
+	sem_unlink("/status");
+	sem_unlink("/write");
+	sem_unlink("/finish_check");
+	prog->system.forks = sem_open("/forks",
 	O_CREAT, 0644, prog->system.number_of_philosophers);
 	if (prog->system.forks == SEM_FAILED)
 		return (-1);
-	prog->system.status = sem_open("status", O_CREAT, 0644, 1);
+	prog->system.status = sem_open("/status", O_CREAT, 0644, 1);
 	if (prog->system.status == SEM_FAILED)
 		return (-1);
-	prog->system.write = sem_open("write", O_CREAT, 0644, 1);
+	prog->system.write = sem_open("/write", O_CREAT, 0644, 1);
 	if (prog->system.write == SEM_FAILED)
 		return (-1);
-	prog->system.finish_check = sem_open("finish_check", O_CREAT, 0644, 1);
+	prog->system.finish_check = sem_open("/finish_check", O_CREAT, 0644, 1);
 	if (prog->system.finish_check == SEM_FAILED)
 		return (-1);
 	return (0);

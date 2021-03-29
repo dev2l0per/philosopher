@@ -74,11 +74,10 @@ void				print_state(char *str, t_philosopher *philo)
 
 void				clear(t_prog *prog)
 {
-	// sem_close(prog->system.forks);
-	// sem_close(prog->system.write);
+	sem_close(prog->system.forks);
+	sem_close(prog->system.write);
+	sem_close(prog->system.finish_check);
 	sem_close(prog->system.status);
-	// printf("asdafdsadsf\n");
-	// sem_close(prog->system.finish_check);
 	free(prog->philo);
 }
 

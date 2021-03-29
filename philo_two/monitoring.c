@@ -22,19 +22,19 @@ void				*full_check(void *arg)
 	full_cnt = 0;
 	while (1)
 	{
+		if (prog->system.finish == 1)
+			return (NULL);
 		i = -1;
+		sem_wait(prog->system.status);
 		while (++i < prog->system.number_of_philosophers)
 			if (prog->philo[i].status == ALIVE && prog->philo[i].eat_cnt
 			>= prog->system.number_of_times_each_philosopher_must_eat
 			&& prog->system.number_of_times_each_philosopher_must_eat)
 			{
-				sem_wait(prog->system.status);
 				prog->philo[i].status = FULL;
-				sem_post(prog->system.status);
 				full_cnt++;
-				break ;
 			}
-		if (full_cnt_check(prog, full_cnt) == 1)
+		if (prog->system.finish == 0 && full_cnt_check(prog, full_cnt) == 1)
 			break ;
 		usleep(50);
 	}
@@ -43,12 +43,13 @@ void				*full_check(void *arg)
 
 int					full_cnt_check(t_prog *prog, int full_cnt)
 {
-	if (full_cnt == prog->system.number_of_philosophers)
+	sem_post(prog->system.status);
+	if (full_cnt == prog->system.number_of_philosophers
+	&& prog->system.finish == 0)
 	{
 		prog->system.finish = 1;
 		sem_wait(prog->system.write);
 		printf("All Philosophers is Full\n");
-		sem_post(prog->system.write);
 		return (1);
 	}
 	return (0);
@@ -69,7 +70,12 @@ void				*death_check(void *arg)
 			sem_wait(philo->prog_ptr->system.status);
 			philo->status = DIED;
 			sem_post(philo->prog_ptr->system.status);
-			print_state("is Died", philo);
+			sem_wait(philo->prog_ptr->system.write);
+			usleep(50);
+			ft_putnbr_fd(get_time() - philo->prog_ptr->system.start_time, 1);
+			ft_putstr_fd("ms ", 1);
+			ft_putnbr_fd(philo->index, 1);
+			ft_putstr_fd(" is Died\n", 1);
 		}
 		sem_post(philo->prog_ptr->system.finish_check);
 		usleep(50);
